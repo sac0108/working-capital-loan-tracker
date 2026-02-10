@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Working Capital Credit Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      --bg: #090d14;
+      --bg-2: #101726;
+      --panel: #121a2b;
+      --panel-2: #172338;
+      --line: #5e4b24;
+      --line-soft: #2b3850;
+      --gold: #dfb774;
+      --gold-soft: #b98b43;
+      --text: #edf1f8;
+      --muted: #9eabc3;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --red: #ef4444;
+      --radius: 14px;
+      --shadow: 0 12px 26px rgba(0,0,0,.32);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 85% 0%,#1b2437,var(--bg) 40%);color:var(--text)}
+    .app{max-width:1320px;margin:0 auto;padding:16px}
+    .header{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+    .title{font-weight:800;letter-spacing:.2px}
+    .subtitle{color:var(--muted);font-size:13px;margin-top:4px}
+    .tabs,.seg-tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{border:1px solid var(--line-soft);background:var(--panel-2);color:var(--text);padding:9px 14px;border-radius:999px;cursor:pointer;font-weight:600}
+    .btn.active,.btn.primary{border-color:var(--gold);background:linear-gradient(180deg,rgba(223,183,116,.2),rgba(185,139,67,.15));color:#ffe9c6}
+    .view{display:none}.view.active{display:block}
+
+    .card,.panel{background:linear-gradient(140deg,var(--panel),#111b2d);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .panel{padding:14px;margin-bottom:12px}
+    .customer{position:sticky;top:8px;z-index:20}
+    .customer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+    .chip{padding:8px;border-radius:10px;border:1px solid rgba(223,183,116,.28);background:rgba(223,183,116,.08)}
+    .chip .k{font-size:11px;color:var(--muted)} .chip .v{font-size:13px;font-weight:700;color:#ffe4b2;margin-top:3px}
+
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:9px;margin:10px 0}
+    .kpi{padding:12px}
+    .kpi .k{font-size:12px;color:var(--muted)} .kpi .v{font-size:20px;font-weight:800;color:#f9d9a0;margin-top:4px}
+
+    .grid-2{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #24324a;text-align:left;vertical-align:top;font-size:13px}
+    th{font-size:12px;color:var(--muted)}
+    .status{padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700}
+    .ok{background:rgba(52,211,153,.2);color:#86efac}
+    .warn{background:rgba(251,191,36,.2);color:#fde68a}
+    .bad{background:rgba(239,68,68,.2);color:#fca5a5}
+    .bar{height:8px;background:#273754;border-radius:999px;overflow:hidden;margin-top:5px}
+    .bar > span{display:block;height:100%}
+    .b-ok{background:var(--green)} .b-warn{background:var(--amber)} .b-bad{background:var(--red)}
+
+    .alerts{display:grid;gap:8px}
+    .alert{padding:10px;border-left:4px solid var(--amber);border-radius:8px;background:rgba(251,191,36,.1);font-size:13px}
+    .alert.bad{border-color:var(--red);background:rgba(239,68,68,.12)}
+
+    .workflow{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+    .stage{padding:10px;border:1px solid var(--line-soft);border-radius:10px;background:#131f33;position:relative;transition:.3s transform,.3s border-color}
+    .stage:hover{transform:translateY(-2px)}
+    .stage.completed{border-color:rgba(52,211,153,.6)}
+    .stage.active{border-color:rgba(251,191,36,.8);box-shadow:0 0 0 1px rgba(251,191,36,.2) inset}
+    .connector{height:2px;background:linear-gradient(90deg,var(--line-soft),transparent);margin:8px 0}
+
+    .chart-wrap{display:grid;gap:10px}
+    .chart{padding:10px;border:1px solid rgba(223,183,116,.3);border-radius:10px;background:rgba(223,183,116,.05)}
+    .bars{display:grid;grid-template-columns:repeat(6,minmax(40px,1fr));gap:8px;align-items:end;height:145px;margin-top:8px}
+    .col{display:flex;flex-direction:column;align-items:center;gap:4px}
+    .col .val,.col .m{font-size:11px;color:var(--muted)}
+    .col .c{width:100%;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,#f6d6a1,#b58239);box-shadow:0 2px 8px rgba(223,183,116,.35)}
+
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:10px}
+    label{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:12px}
+    input,select{background:#0f1828;color:var(--text);border:1px solid var(--line-soft);padding:8px;border-radius:10px;font:inherit}
+    dialog{border:1px solid var(--line);border-radius:14px;background:#0f1827;color:var(--text);width:min(980px,95vw)}
+    dialog::backdrop{background:rgba(0,0,0,.55)}
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+    .empty{border:1px dashed var(--line-soft);padding:12px;border-radius:10px;color:var(--muted);text-align:center}
+    @media (max-width:980px){.grid-2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div>
+      <div class="title">Working Capital Credit Intelligence Platform</div>
+      <div class="subtitle">Unified credit lifecycle intelligence for Relationship, Credit, and Ops teams.</div>
+    </div>
+    <nav class="tabs">
+      <button class="btn active" data-view="dashboard">Dashboard</button>
+      <button class="btn" data-view="borrowers">Borrowers</button>
+      <button class="btn" data-view="detail">Borrower Detail</button>
+    </nav>
+  </header>
+
+  <section id="view-dashboard" class="view active">
+    <div id="dashCustomer" class="panel customer"></div>
+    <div class="controls">
+      <label>Customer<select id="dashboardBorrower"></select></label>
+      <button class="btn primary" id="advanceStage"><i class="fa-solid fa-forward-step"></i> Advance Workflow Stage</button>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <h3 style="margin:0">Layer 1: Loan Application Acceptance Workflow</h3>
+        <span id="workflowProgress" class="status warn">In Progress</span>
+      </div>
+      <div class="connector"></div>
+      <div id="workflowTrack" class="workflow"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3 style="margin:0 0 8px">Layer 2: Credit Sanction & Setup</h3>
+        <div id="sanctionCard"></div>
+      </div>
+      <div class="panel">
+        <h3 style="margin:0 0 8px">Layer 3 Control</h3>
+        <div class="seg-tabs">
+          <button class="btn active product-tab" data-product="fund">Fund Based</button>
+          <button class="btn product-tab" data-product="nonfund">Non-Fund Based</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted)">Metrics and facilities below update dynamically based on selected product bucket and active customer.</p>
+      </div>
+    </div>
+
+    <div id="dashboardKpis" class="kpis"></div>
+
+    <div class="panel">
+      <h3 id="facilityTitle" style="margin:0 0 8px">Facilities</h3>
+      <div class="table-wrap"><table><thead><tr>
+        <th>Facility Type</th><th>Exposure</th><th>Utilized</th><th>Utilization %</th><th>ROI</th><th>Collateral</th><th>Interest Paid</th><th>Interest Payable</th><th>Renewal Date</th><th>Risk</th>
+      </tr></thead><tbody id="dashboardTable"></tbody></table></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel"><h3 style="margin:0 0 8px">CC Utilization Analytics</h3><div id="ccCharts" class="chart-wrap"></div></div>
+      <div class="panel"><h3 style="margin:0 0 8px">Portfolio Alerts</h3><div id="alerts" class="alerts"></div></div>
+    </div>
+  </section>
+
+  <section id="view-borrowers" class="view">
+    <div class="controls">
+      <label>Risk<select id="riskFilter"><option value="">All</option><option>Low</option><option>Medium</option><option>High</option></select></label>
+      <label>RM<input id="rmFilter" placeholder="Relationship manager" /></label>
+      <label>Renewal ≤ days<select id="renewalFilter"><option value="">Any</option><option value="30">30</option><option value="60">60</option><option value="90">90</option></select></label>
+      <button class="btn" id="clearFilters">Clear</button>
+      <button class="btn primary" id="addBorrower">+ Add Borrower</button>
+    </div>
+    <div class="panel">
+      <div class="table-wrap"><table><thead><tr><th>Borrower</th><th>Industry</th><th>RM</th><th>Risk</th><th>Exposure</th><th>Utilized</th><th>Avg Utilization</th><th>Actions</th></tr></thead><tbody id="borrowerTable"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="view-detail" class="view">
+    <div id="detailCustomer" class="panel customer"></div>
+    <div class="controls">
+      <label>Borrower<select id="detailBorrower"></select></label>
+      <button class="btn primary" id="addFacility">+ Add Facility</button>
+    </div>
+    <div id="detailContent"></div>
+  </section>
+</div>
+
+<dialog id="borrowerDialog"><form id="borrowerForm" method="dialog">
+  <h3 id="borrowerDialogTitle">Add Borrower</h3>
+  <input type="hidden" id="borrowerId" />
+  <div class="form-grid">
+    <label>Customer Name<input id="bName" required></label>
+    <label>Industry<input id="bIndustry" required></label>
+    <label>Relationship Manager<input id="bRm" required></label>
+    <label>Risk Rating<select id="bRisk"><option>Low</option><option>Medium</option><option>High</option></select></label>
+    <label>GST Number<input id="bGst" required></label>
+    <label>Bank Name<input id="bBank" required></label>
+    <label>Contact Number<input id="bContact" required></label>
+    <label>Loan Account Number<input id="bLoanAcc" required></label>
+  </div>
+  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px"><button type="button" class="btn" id="cancelBorrower">Cancel</button><button class="btn primary" type="submit">Save</button></div>
+</form></dialog>
+
+<dialog id="facilityDialog"><form id="facilityForm" method="dialog">
+  <h3 id="facilityDialogTitle">Add Facility</h3>
+  <input type="hidden" id="facilityBorrowerId"><input type="hidden" id="facilityId">
+  <div class="form-grid">
+    <label>Product<select id="fType"><option value="CC">Cash Credit (CC)</option><option value="OD">Overdraft (OD)</option><option value="TERM_LOAN">Term Loan</option><option value="LC">Letter of Credit (LC)</option><option value="BG">Bank Guarantee (BG)</option><option value="LCBN">LC Buyer’s Credit (LCBN)</option></select></label>
+    <label>Sanctioned Limit<input id="fSanctioned" type="number" min="0" step="0.01" required></label>
+    <label>Drawing Power<input id="fDp" type="number" min="0" step="0.01" required></label>
+    <label>Current Utilization<input id="fUtil" type="number" min="0" step="0.01" required></label>
+    <label>ROI (%)<input id="fRoi" type="number" min="0" step="0.01" required></label>
+    <label>Tenure (months)<input id="fTenure" type="number" min="1" required></label>
+    <label>Collateral<select id="fCollateral"><option>SORP</option><option>SOCP</option><option>Current Assets</option></select></label>
+    <label>Interest Paid<input id="fInterestPaid" type="number" min="0" step="0.01" required></label>
+    <label>Interest Payable<input id="fInterestPayable" type="number" min="0" step="0.01" required></label>
+    <label>Renewal Date<input id="fRenewal" type="date" required></label>
+    <label>Sanction Date<input id="fSanctionDate" type="date" required></label>
+  </div>
+  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px"><button type="button" class="btn" id="cancelFacility">Cancel</button><button class="btn primary" type="submit">Save</button></div>
+</form></dialog>
+
+<script>
+const STORAGE_KEY = 'wc-credit-intel-v3';
+const FACILITY_GROUP = { fund:['CC','OD','TERM_LOAN'], nonfund:['LC','BG','LCBN'] };
+const FACILITY_LABEL = { CC:'Cash Credit (CC)', OD:'Overdraft (OD)', TERM_LOAN:'Term Loan', LC:'Letter of Credit (LC)', BG:'Bank Guarantee (BG)', LCBN:"LC Buyer’s Credit (LCBN)" };
+const STAGES = [
+  'Loan Application Received','Application Reviewed by Bank','Application Submitted into System','Loan Approval Decision','Loan Amount Approved based on Credit Limit','Document Preparation','Customer & Bank Notification','Contract Signing','Final System Submission','Fund Allocation to Customer'
+];
+
+const creditState = {
+  activeView:'dashboard', activeBorrowerId:'', productTab:'fund',
+  filters:{risk:'',rm:'',renewal:''},
+  borrowers:[]
+};
+
+const todayISO = ()=> new Date().toISOString().split('T')[0];
+const inr = v => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(Number(v||0));
+const pct = v => `${Number(v||0).toFixed(1)}%`;
+const uid = p => `${p}_${Math.random().toString(36).slice(2,10)}`;
+const daysUntil = d => Math.ceil((new Date(d)-new Date(todayISO()))/86400000);
+
+function baseLimit(f){ return Math.min(Number(f.sanctionedLimit||0), Number(f.drawingPower||0)) || Number(f.sanctionedLimit||0) || Number(f.drawingPower||0); }
+function metrics(f){
+  const exposure = baseLimit(f), utilized = Number(f.currentUtilization||0), utilPct = exposure?utilized/exposure*100:0, available=Math.max(0,exposure-utilized), days=daysUntil(f.renewalDate);
+  let risk='Low'; if(utilPct>90 || days<=30 || available<=1) risk='High'; else if(utilPct>75 || days<=60) risk='Medium';
+  const alerts=[]; if(utilPct>90) alerts.push('Utilization > 90%'); if(days<=30) alerts.push('Renewal due within 30 days'); if(available<=1) alerts.push('Limit exhaustion / available ≈ 0'); if(risk==='High') alerts.push('High risk facility');
+  return {exposure, utilized, utilPct, available, days, risk, alerts};
+}
+
+function seed(){
+  const bId=uid('bor');
+  creditState.borrowers=[{
+    id:bId,name:'Apex Textiles Pvt Ltd',industry:'Textiles',relationshipManager:'Rhea Kapoor',riskRating:'Medium',gstNumber:'27AAECA1234F1Z5',bankName:'Axis Bank',contactNumber:'+91 9898989898',loanAccountNumber:'WC-AXIS-000182',
+    workflow:{index:4,statuses:STAGES.map((_,i)=> i<4?'Completed':i===4?'In Progress':'Pending')},
+    facilities:[
+      {id:uid('fac'),facilityType:'CC',sanctionedLimit:5000000,drawingPower:4700000,currentUtilization:4300000,interestRate:10.25,tenure:12,collateralType:'Current Assets',totalInterestPaid:415000,interestPayable:35000,renewalDate:addDays(28),sanctionDate:addDays(-90)},
+      {id:uid('fac'),facilityType:'OD',sanctionedLimit:1800000,drawingPower:1750000,currentUtilization:980000,interestRate:11.1,tenure:24,collateralType:'SORP',totalInterestPaid:126000,interestPayable:19000,renewalDate:addDays(46),sanctionDate:addDays(-130)},
+      {id:uid('fac'),facilityType:'BG',sanctionedLimit:2200000,drawingPower:2200000,currentUtilization:1600000,interestRate:3.2,tenure:12,collateralType:'SOCP',totalInterestPaid:86000,interestPayable:12000,renewalDate:addDays(68),sanctionDate:addDays(-120)}
+    ]
+  }];
+  creditState.activeBorrowerId=bId;
+  persist();
+}
+function addDays(d){ const x=new Date(); x.setDate(x.getDate()+d); return x.toISOString().split('T')[0]; }
+
+function persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify({borrowers:creditState.borrowers})); }
+function load(){ const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return seed(); try{ const p=JSON.parse(raw); creditState.borrowers=Array.isArray(p.borrowers)?p.borrowers:[]; if(!creditState.borrowers.length) seed(); }catch{ seed(); } creditState.activeBorrowerId=creditState.borrowers[0]?.id||''; }
+function borrower(){ return creditState.borrowers.find(b=>b.id===creditState.activeBorrowerId) || creditState.borrowers[0] || null; }
+
+function customerHTML(b){ if(!b) return '<div class="empty">No borrower selected.</div>'; const rows=[['Customer Name',b.name],['GST Number',b.gstNumber],['Bank Name',b.bankName],['Industry',b.industry],['Contact Number',b.contactNumber],['Loan Account Number',b.loanAccountNumber]]; return `<div class="customer-grid">${rows.map(([k,v])=>`<div class="chip"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>`; }
+function riskClass(r){ return r==='High'?'bad':r==='Medium'?'warn':'ok'; }
+
+function renderWorkflow(b){
+  const root=document.getElementById('workflowTrack');
+  root.innerHTML=STAGES.map((s,i)=>{
+    const st=b.workflow.statuses[i];
+    const cls=st==='Completed'?'completed':st==='In Progress'?'active':'';
+    const chip=st==='Completed'?'ok':st==='In Progress'?'warn':'bad';
+    return `<div class="stage ${cls}"><div style="display:flex;justify-content:space-between;gap:8px"><strong style="font-size:12px">${i+1}. ${s}</strong><span class="status ${chip}">${st}</span></div></div>`;
+  }).join('');
+  const done=b.workflow.statuses.filter(s=>s==='Completed').length;
+  const inProg=b.workflow.statuses.includes('In Progress');
+  const prog=document.getElementById('workflowProgress');
+  prog.className=`status ${done===STAGES.length?'ok':inProg?'warn':'bad'}`;
+  prog.textContent=done===STAGES.length?'Completed':`In Progress (${done}/${STAGES.length})`;
+}
+
+function sanctionCard(b){
+  const approved = b.workflow.statuses[3]==='Completed' || b.workflow.statuses[3]==='In Progress';
+  const refFac=b.facilities[0];
+  if(!approved) return `<div class="empty">Loan approval pending. Sanction summary will be generated after approval decision stage completion.</div>`;
+  return `<div class="card" style="padding:12px"><div class="customer-grid">
+    <div><div style="color:var(--muted);font-size:12px">Loan Account Number</div><div style="font-weight:700">${b.loanAccountNumber}</div></div>
+    <div><div style="color:var(--muted);font-size:12px">Approved Limit</div><div style="font-weight:700;color:#f7d295">${inr(refFac.sanctionedLimit)}</div></div>
+    <div><div style="color:var(--muted);font-size:12px">Product Type</div><div style="font-weight:700">${FACILITY_LABEL[refFac.facilityType]}</div></div>
+    <div><div style="color:var(--muted);font-size:12px">Rate of Interest</div><div style="font-weight:700">${pct(refFac.interestRate)}</div></div>
+    <div><div style="color:var(--muted);font-size:12px">Collateral Type</div><div style="font-weight:700">${refFac.collateralType}</div></div>
+    <div><div style="color:var(--muted);font-size:12px">Tenure</div><div style="font-weight:700">${refFac.tenure} months</div></div>
+    <div><div style="color:var(--muted);font-size:12px">Sanction Date</div><div style="font-weight:700">${refFac.sanctionDate}</div></div>
+  </div></div>`;
+}
+
+function renderDashboard(){
+  const b=borrower();
+  document.getElementById('dashCustomer').innerHTML=customerHTML(b);
+  const sel=document.getElementById('dashboardBorrower'); sel.innerHTML=creditState.borrowers.map(x=>`<option value="${x.id}" ${x.id===b?.id?'selected':''}>${x.name}</option>`).join('');
+  if(!b) return;
+  renderWorkflow(b);
+  document.getElementById('sanctionCard').innerHTML=sanctionCard(b);
+
+  const facilities=b.facilities.filter(f=>FACILITY_GROUP[creditState.productTab].includes(f.facilityType));
+  document.getElementById('facilityTitle').textContent = creditState.productTab==='fund'?'Fund Based Facilities':'Non-Fund Based Facilities';
+  const mRows=facilities.map(f=>({f,m:metrics(f)}));
+  const exposure=mRows.reduce((s,r)=>s+r.m.exposure,0), utilized=mRows.reduce((s,r)=>s+r.m.utilized,0), weightedRoi=exposure?mRows.reduce((s,r)=>s+r.f.interestRate*r.m.exposure,0)/exposure:0;
+  const collateral=[...new Set(mRows.map(r=>r.f.collateralType))].join(' / ')||'--', interestPaid=mRows.reduce((s,r)=>s+Number(r.f.totalInterestPaid||0),0), interestPay=mRows.reduce((s,r)=>s+Number(r.f.interestPayable||0),0);
+
+  document.getElementById('dashboardKpis').innerHTML=[['Total Exposure',inr(exposure)],['Amount Utilized',inr(utilized)],['Weighted Average ROI',pct(weightedRoi)],['Collateral Attached',collateral],['Total Interest Paid',inr(interestPaid)],['Interest Payable (Outstanding)',inr(interestPay)]]
+    .map(([k,v])=>`<div class="card kpi"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+
+  document.getElementById('dashboardTable').innerHTML=mRows.length?mRows.map(({f,m})=>`<tr>
+    <td>${FACILITY_LABEL[f.facilityType]}</td><td>${inr(m.exposure)}</td><td>${inr(m.utilized)}</td>
+    <td>${pct(m.utilPct)}<div class="bar"><span class="${m.utilPct>90?'b-bad':m.utilPct>75?'b-warn':'b-ok'}" style="width:${Math.min(m.utilPct,100)}%"></span></div></td>
+    <td>${pct(f.interestRate)}</td><td>${f.collateralType}</td><td>${inr(f.totalInterestPaid)}</td><td>${inr(f.interestPayable)}</td><td>${f.renewalDate}</td><td><span class="status ${riskClass(m.risk)}">${m.risk}</span></td>
+  </tr>`).join(''):`<tr><td colspan="10">No ${creditState.productTab==='fund'?'Fund Based':'Non-Fund Based'} facilities availed.</td></tr>`;
+
+  const alerts=mRows.flatMap(({f,m})=>m.alerts.map(a=>({msg:`${FACILITY_LABEL[f.facilityType]}: ${a}`,bad:a.includes('High risk')||a.includes('> 90')||a.includes('exhaustion')}));
+  document.getElementById('alerts').innerHTML=alerts.length?alerts.map(a=>`<div class="alert ${a.bad?'bad':''}"><i class="fa-solid fa-triangle-exclamation"></i> ${a.msg}</div>`).join(''):'<div class="empty">No active alerts for selected segment.</div>';
+
+  const cc=mRows.filter(r=>r.f.facilityType==='CC');
+  document.getElementById('ccCharts').innerHTML=cc.length?cc.map(({f},i)=>{
+    const months=['Apr','May','Jun','Jul','Aug','Sep']; const base=metrics(f).utilPct;
+    const data=months.map((m,ix)=>({m,v:Math.max(38,Math.min(98,base+((ix%2?1:-1)*(ix+1)*2.1)%10))}));
+    return `<div class="chart"><div style="font-weight:700">Cash Credit Utilization ${cc.length>1?'#'+(i+1):''}</div><div class="bars">${data.map(d=>`<div class="col"><div class="val">${d.v.toFixed(1)}%</div><div class="c" style="height:${Math.max(10,d.v)}%"></div><div class="m">${d.m}</div></div>`).join('')}</div></div>`;
+  }).join(''):'<div class="empty">No Cash Credit facilities available for analytics in selected segment.</div>';
+}
+
+function aggregateBorrower(b){const ms=b.facilities.map(metrics);return{exposure:ms.reduce((s,m)=>s+m.exposure,0),util:ms.reduce((s,m)=>s+m.utilized,0),avg:ms.length?ms.reduce((s,m)=>s+m.utilPct,0)/ms.length:0,minDays:ms.length?Math.min(...ms.map(m=>m.days)):Infinity};}
+
+function filteredBorrowers(){return creditState.borrowers.filter(b=>{const a=aggregateBorrower(b);return (!creditState.filters.risk||b.riskRating===creditState.filters.risk)&&(!creditState.filters.rm||b.relationshipManager.toLowerCase().includes(creditState.filters.rm.toLowerCase()))&&(!creditState.filters.renewal||a.minDays<=Number(creditState.filters.renewal));});}
+
+function renderBorrowers(){
+  const rows=filteredBorrowers();
+  document.getElementById('borrowerTable').innerHTML=rows.length?rows.map(b=>{const a=aggregateBorrower(b);return `<tr><td>${b.name}</td><td>${b.industry}</td><td>${b.relationshipManager}</td><td><span class="status ${riskClass(b.riskRating)}">${b.riskRating}</span></td><td>${inr(a.exposure)}</td><td>${inr(a.util)}</td><td>${pct(a.avg)}<div class="bar"><span class="${a.avg>90?'b-bad':a.avg>75?'b-warn':'b-ok'}" style="width:${Math.min(100,a.avg)}%"></span></div></td><td><button class="btn" data-act="view" data-id="${b.id}">View</button> <button class="btn" data-act="edit" data-id="${b.id}">Edit</button> <button class="btn" data-act="delete" data-id="${b.id}">Delete</button></td></tr>`;}).join(''):'<tr><td colspan="8">No borrowers found.</td></tr>';
+}
+
+function renderDetail(){
+  const b=borrower();
+  document.getElementById('detailCustomer').innerHTML=customerHTML(b);
+  document.getElementById('detailBorrower').innerHTML=creditState.borrowers.map(x=>`<option value="${x.id}" ${x.id===b?.id?'selected':''}>${x.name}</option>`).join('');
+  if(!b){document.getElementById('detailContent').innerHTML='<div class="empty">Add borrower to begin.</div>';return;}
+  const a=aggregateBorrower(b);
+  const alerts=b.facilities.flatMap(f=>metrics(f).alerts.map(x=>`${FACILITY_LABEL[f.facilityType]}: ${x}`));
+  document.getElementById('detailContent').innerHTML=`
+    <div class="kpis">
+      <div class="card kpi"><div class="k">Risk Rating</div><div class="v"><span class="status ${riskClass(b.riskRating)}">${b.riskRating}</span></div></div>
+      <div class="card kpi"><div class="k">Total Exposure</div><div class="v">${inr(a.exposure)}</div></div>
+      <div class="card kpi"><div class="k">Total Utilized</div><div class="v">${inr(a.util)}</div></div>
+      <div class="card kpi"><div class="k">Average Utilization</div><div class="v">${pct(a.avg)}</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel"><h3 style="margin:0 0 8px">Facilities</h3><div class="table-wrap"><table><thead><tr><th>Type</th><th>Exposure</th><th>Utilized</th><th>Util %</th><th>ROI</th><th>Renewal</th><th>Risk</th><th>Actions</th></tr></thead><tbody>
+      ${b.facilities.map(f=>{const m=metrics(f);return `<tr><td>${FACILITY_LABEL[f.facilityType]}</td><td>${inr(m.exposure)}</td><td>${inr(m.utilized)}</td><td>${pct(m.utilPct)}</td><td>${pct(f.interestRate)}</td><td>${f.renewalDate}</td><td><span class="status ${riskClass(m.risk)}">${m.risk}</span></td><td><button class="btn" data-fact="edit" data-id="${f.id}">Edit</button> <button class="btn" data-fact="delete" data-id="${f.id}">Delete</button></td></tr>`;}).join('') || '<tr><td colspan="8">No facilities</td></tr>'}
+      </tbody></table></div></div>
+      <div class="panel"><h3 style="margin:0 0 8px">Facility Alerts</h3><div class="alerts">${alerts.length?alerts.map(a=>`<div class="alert"><i class="fa-solid fa-bell"></i> ${a}</div>`).join(''):'<div class="empty">No alerts.</div>'}</div></div>
+    </div>`;
+}
+
+function renderAll(){ renderDashboard(); renderBorrowers(); renderDetail(); }
+
+function switchView(v){ creditState.activeView=v; document.querySelectorAll('.tabs .btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v)); document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===`view-${v}`)); }
+
+function openBorrowerDialog(b=null){
+  borrowerDialogTitle.textContent=b?'Edit Borrower':'Add Borrower'; borrowerId.value=b?.id||''; bName.value=b?.name||''; bIndustry.value=b?.industry||''; bRm.value=b?.relationshipManager||''; bRisk.value=b?.riskRating||'Low'; bGst.value=b?.gstNumber||''; bBank.value=b?.bankName||''; bContact.value=b?.contactNumber||''; bLoanAcc.value=b?.loanAccountNumber||''; borrowerDialog.showModal();
+}
+function openFacilityDialog(bId,f=null){ facilityDialogTitle.textContent=f?'Edit Facility':'Add Facility'; facilityBorrowerId.value=bId; facilityId.value=f?.id||''; fType.value=f?.facilityType||'CC'; fSanctioned.value=f?.sanctionedLimit||''; fDp.value=f?.drawingPower||''; fUtil.value=f?.currentUtilization||''; fRoi.value=f?.interestRate||''; fTenure.value=f?.tenure||12; fCollateral.value=f?.collateralType||'Current Assets'; fInterestPaid.value=f?.totalInterestPaid||''; fInterestPayable.value=f?.interestPayable||''; fRenewal.value=f?.renewalDate||todayISO(); fSanctionDate.value=f?.sanctionDate||todayISO(); facilityDialog.showModal(); }
+
+function bind(){
+  document.querySelectorAll('.tabs .btn').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
+  document.querySelectorAll('.product-tab').forEach(b=>b.onclick=()=>{creditState.productTab=b.dataset.product;document.querySelectorAll('.product-tab').forEach(x=>x.classList.toggle('active',x===b));renderDashboard();});
+  dashboardBorrower.onchange=e=>{creditState.activeBorrowerId=e.target.value;renderAll();}; detailBorrower.onchange=e=>{creditState.activeBorrowerId=e.target.value;renderAll();};
+  advanceStage.onclick=()=>{const b=borrower(); if(!b) return; const idx=b.workflow.statuses.findIndex(s=>s==='In Progress'); if(idx===-1) return; b.workflow.statuses[idx]='Completed'; if(idx+1<b.workflow.statuses.length) b.workflow.statuses[idx+1]='In Progress'; b.workflow.index=Math.min(idx+1,b.workflow.statuses.length-1); persist(); renderDashboard();};
+
+  riskFilter.onchange=e=>{creditState.filters.risk=e.target.value;renderBorrowers();}; rmFilter.oninput=e=>{creditState.filters.rm=e.target.value;renderBorrowers();}; renewalFilter.onchange=e=>{creditState.filters.renewal=e.target.value;renderBorrowers();};
+  clearFilters.onclick=()=>{creditState.filters={risk:'',rm:'',renewal:''}; riskFilter.value='';rmFilter.value='';renewalFilter.value='';renderBorrowers();};
+
+  addBorrower.onclick=()=>openBorrowerDialog(); cancelBorrower.onclick=()=>borrowerDialog.close();
+  borrowerForm.onsubmit=e=>{e.preventDefault(); const id=borrowerId.value; const payload={id:id||uid('bor'),name:bName.value.trim(),industry:bIndustry.value.trim(),relationshipManager:bRm.value.trim(),riskRating:bRisk.value,gstNumber:bGst.value.trim(),bankName:bBank.value.trim(),contactNumber:bContact.value.trim(),loanAccountNumber:bLoanAcc.value.trim(),workflow:{index:0,statuses:STAGES.map((_,i)=>i===0?'In Progress':'Pending')},facilities:[]}; if(id){const ex=creditState.borrowers.find(x=>x.id===id); Object.assign(ex,payload,{workflow:ex.workflow,facilities:ex.facilities});} else {creditState.borrowers.push(payload); creditState.activeBorrowerId=payload.id;} persist(); borrowerDialog.close(); renderAll(); };
+
+  borrowerTable.onclick=e=>{const btn=e.target.closest('button[data-act]'); if(!btn) return; const b=creditState.borrowers.find(x=>x.id===btn.dataset.id); if(!b) return; if(btn.dataset.act==='view'){creditState.activeBorrowerId=b.id; switchView('detail'); renderAll();} if(btn.dataset.act==='edit') openBorrowerDialog(b); if(btn.dataset.act==='delete'){if(!confirm(`Delete borrower ${b.name}?`)) return; creditState.borrowers=creditState.borrowers.filter(x=>x.id!==b.id); creditState.activeBorrowerId=creditState.borrowers[0]?.id||''; persist(); renderAll();}};
+
+  addFacility.onclick=()=>{const b=borrower(); if(!b) return; openFacilityDialog(b.id);}; cancelFacility.onclick=()=>facilityDialog.close();
+  facilityForm.onsubmit=e=>{e.preventDefault(); const b=creditState.borrowers.find(x=>x.id===facilityBorrowerId.value); if(!b) return; const id=facilityId.value; const payload={id:id||uid('fac'),facilityType:fType.value,sanctionedLimit:Number(fSanctioned.value),drawingPower:Number(fDp.value),currentUtilization:Number(fUtil.value),interestRate:Number(fRoi.value),tenure:Number(fTenure.value),collateralType:fCollateral.value,totalInterestPaid:Number(fInterestPaid.value),interestPayable:Number(fInterestPayable.value),renewalDate:fRenewal.value,sanctionDate:fSanctionDate.value}; if(id){const i=b.facilities.findIndex(x=>x.id===id); b.facilities[i]=payload;} else b.facilities.push(payload); persist(); facilityDialog.close(); renderAll(); };
+
+  detailContent.onclick=e=>{const btn=e.target.closest('button[data-fact]'); if(!btn) return; const b=borrower(); if(!b) return; const f=b.facilities.find(x=>x.id===btn.dataset.id); if(!f) return; if(btn.dataset.fact==='edit') openFacilityDialog(b.id,f); if(btn.dataset.fact==='delete'){if(!confirm('Delete facility?')) return; b.facilities=b.facilities.filter(x=>x.id!==f.id); persist(); renderAll();}};
+}
+
+load(); bind(); renderAll();
+</script>
+</body>
+</html>
