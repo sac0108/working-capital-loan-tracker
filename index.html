@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Working Capital Loan Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div>
+          <h1>Working Capital Loan Tracker</h1>
+          <p class="subtitle">Premium working capital intelligence dashboard.</p>
+        </div>
+        <nav class="nav-tabs" aria-label="Primary">
+          <button class="tab-btn active" data-view="dashboard">Dashboard</button>
+          <button class="tab-btn" data-view="borrowers">Borrowers</button>
+          <button class="tab-btn" data-view="details">Borrower Detail</button>
+        </nav>
+      </header>
+
+      <main>
+        <section id="view-dashboard" class="view active" aria-labelledby="dashboard-heading">
+          <div id="dashboard-customer-panel" class="customer-panel sticky-panel"></div>
+
+          <div class="section-head">
+            <h2 id="dashboard-heading">Dashboard</h2>
+            <label>
+              Customer
+              <select id="dashboard-borrower-select"></select>
+            </label>
+          </div>
+
+          <div class="segmented-tabs" role="tablist" aria-label="Facility categories">
+            <button class="segment-btn active" data-product-tab="fund">Fund Based</button>
+            <button class="segment-btn" data-product-tab="nonfund">Non-Fund Based</button>
+          </div>
+
+          <div class="cards" id="dashboard-cards"></div>
+
+          <div class="panel">
+            <h3 id="dashboard-table-title">Facilities</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Facility</th>
+                    <th>Exposure</th>
+                    <th>Utilized</th>
+                    <th>Utilization</th>
+                    <th>ROI</th>
+                    <th>Collateral</th>
+                    <th>Interest Paid</th>
+                    <th>Interest Payable</th>
+                    <th>Renewal</th>
+                    <th>Risk</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-facilities-table"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Portfolio Alerts</h3>
+            <div id="portfolio-alerts" class="alert-list"></div>
+          </div>
+
+          <div class="panel">
+            <h3>CC Utilization Analytics (Month-wise)</h3>
+            <div id="cc-chart"></div>
+          </div>
+        </section>
+
+        <section id="view-borrowers" class="view" aria-labelledby="borrowers-heading">
+          <div class="section-head">
+            <h2 id="borrowers-heading">Borrowers</h2>
+            <button id="open-borrower-form" class="btn primary">+ Add Borrower</button>
+          </div>
+
+          <div class="panel">
+            <h3>Filters</h3>
+            <div class="filters">
+              <label>
+                Risk
+                <select id="filter-risk">
+                  <option value="">All</option>
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </label>
+              <label>
+                Relationship Manager
+                <input id="filter-rm" type="text" placeholder="Type RM name" />
+              </label>
+              <label>
+                Renewal in days
+                <select id="filter-renewal">
+                  <option value="">Any</option>
+                  <option value="30">Within 30 days</option>
+                  <option value="60">Within 60 days</option>
+                  <option value="90">Within 90 days</option>
+                </select>
+              </label>
+              <button id="clear-filters" class="btn ghost">Clear</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Industry</th>
+                    <th>RM</th>
+                    <th>Risk</th>
+                    <th>Total Exposure</th>
+                    <th>Total Utilized</th>
+                    <th>Avg Utilization</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="borrowers-table"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <dialog id="borrower-dialog">
+            <form id="borrower-form" method="dialog">
+              <h3 id="borrower-form-title">Add Borrower</h3>
+              <input type="hidden" id="borrower-id" />
+              <div class="form-grid">
+                <label>Borrower Name<input id="borrower-name" required type="text" /></label>
+                <label>Industry<input id="borrower-industry" required type="text" /></label>
+                <label>Relationship Manager<input id="borrower-rm" required type="text" /></label>
+                <label>GST Number<input id="borrower-gst" required type="text" /></label>
+                <label>Bank Name<input id="borrower-bank" required type="text" /></label>
+                <label>Contact Number<input id="borrower-contact" required type="text" /></label>
+                <label>Loan Account Number<input id="borrower-loan-account" required type="text" /></label>
+                <label>
+                  Risk Rating
+                  <select id="borrower-risk" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </label>
+              </div>
+              <div class="dialog-actions">
+                <button type="button" id="cancel-borrower" class="btn ghost">Cancel</button>
+                <button type="submit" class="btn primary">Save</button>
+              </div>
+            </form>
+          </dialog>
+        </section>
+
+        <section id="view-details" class="view" aria-labelledby="details-heading">
+          <div id="details-customer-panel" class="customer-panel sticky-panel"></div>
+
+          <div class="section-head">
+            <h2 id="details-heading">Borrower Detail</h2>
+            <div class="inline-actions">
+              <label>
+                Select Borrower
+                <select id="detail-borrower-select"></select>
+              </label>
+              <button id="open-facility-form" class="btn primary">+ Add Facility</button>
+            </div>
+          </div>
+
+          <div id="borrower-detail-content" class="detail-grid"></div>
+
+          <dialog id="facility-dialog">
+            <form id="facility-form" method="dialog">
+              <h3 id="facility-form-title">Add Facility</h3>
+              <input type="hidden" id="facility-borrower-id" />
+              <input type="hidden" id="facility-id" />
+              <div class="form-grid">
+                <label>
+                  Facility Type
+                  <select id="facility-type" required>
+                    <option value="CC">Cash Credit (CC)</option>
+                    <option value="OD">Overdraft (OD)</option>
+                    <option value="TERM_LOAN">Term Loan</option>
+                    <option value="LC">Letter of Credit (LC)</option>
+                    <option value="BG">Bank Guarantee (BG)</option>
+                    <option value="LCBN">LC Buyer’s Credit (LCBN)</option>
+                  </select>
+                </label>
+                <label>Sanctioned Limit<input id="facility-sanctioned" min="0" step="0.01" required type="number" /></label>
+                <label>Drawing Power<input id="facility-dp" min="0" step="0.01" required type="number" /></label>
+                <label>Current Utilization<input id="facility-utilization" min="0" step="0.01" required type="number" /></label>
+                <label>Interest Rate (%)<input id="facility-rate" min="0" step="0.01" required type="number" /></label>
+                <label>Tenure (months)<input id="facility-tenure" min="1" step="1" required type="number" /></label>
+                <label>
+                  Collateral Attached
+                  <select id="facility-collateral" required>
+                    <option value="SORP">SORP</option>
+                    <option value="SOCP">SOCP</option>
+                    <option value="Current Assets">Current Assets</option>
+                  </select>
+                </label>
+                <label>Total Interest Paid<input id="facility-interest-paid" min="0" step="0.01" required type="number" /></label>
+                <label>Interest Payable<input id="facility-interest-payable" min="0" step="0.01" required type="number" /></label>
+                <label>Renewal Date<input id="facility-renewal" required type="date" /></label>
+              </div>
+              <div class="dialog-actions">
+                <button type="button" id="cancel-facility" class="btn ghost">Cancel</button>
+                <button type="submit" class="btn primary">Save</button>
+              </div>
+            </form>
+          </dialog>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
