@@ -3,296 +3,227 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Working Capital Credit Lifecycle Platform</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+  <title>Working Capital Credit Lifecycle</title>
   <style>
-    :root {
-      --bg:#070c17; --bg2:#101827; --card:#111c2f; --line:#26344f; --text:#e8edf6; --muted:#9aa7be;
-      --gold:#d4af37; --gold-soft:#f1dd95; --green:#22c55e; --amber:#f59e0b; --red:#ef4444;
-      --radius:16px; --shadow:0 12px 32px rgba(0,0,0,.35);
-    }
+    :root { --bg:#0b1220; --panel:#131c2f; --line:#2d3a56; --text:#e7edf8; --muted:#a8b4cc; --gold:#e6bf66; --ok:#22c55e; --warn:#f59e0b; }
     *{box-sizing:border-box}
-    body{margin:0;background:radial-gradient(circle at 90% -10%,#2a3a63 0,var(--bg) 40%),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
-    .app{max-width:1450px;margin:0 auto;padding:20px}
-    .header{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
-    h1{margin:0;font-size:26px}
-    .sub{margin:6px 0 0;color:var(--muted)}
-    .nav,.seg{display:flex;gap:10px;flex-wrap:wrap}
-    button,input,select{font:inherit}
-    .btn{background:#17233b;border:1px solid var(--line);color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
-    .btn:hover{border-color:var(--gold)}
-    .btn.primary{background:linear-gradient(180deg,#2a1f06,#1b1507);border-color:#8f731e;color:var(--gold-soft)}
-    .btn.active{border-color:var(--gold);color:var(--gold-soft)}
-    .card{background:linear-gradient(180deg,var(--card),#0f182a);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .panel{padding:16px;margin-top:14px}
-    .view{display:none}.view.active{display:block}
-    .grid{display:grid;gap:12px}
-    .kpis{grid-template-columns:repeat(6,minmax(140px,1fr))}
-    .kpi{padding:14px}.kpi .v{font-size:22px;color:var(--gold-soft);font-weight:800}.kpi .l{font-size:12px;color:var(--muted)}
-    .form{display:grid;grid-template-columns:repeat(3,minmax(200px,1fr));gap:12px}
-    .f{display:flex;flex-direction:column;gap:6px}.f span{font-size:12px;color:var(--muted)}
-    input,select{background:#0c1424;color:var(--text);border:1px solid var(--line);padding:10px;border-radius:10px}
-    .row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top right,#233255,#0a111f 42%);color:var(--text)}
+    .app{max-width:1200px;margin:0 auto;padding:20px}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+    .row{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
     .muted{color:var(--muted)}
-    .customer-list{display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:12px}
-    .customer-item{padding:14px;cursor:pointer;transition:.2s}
-    .customer-item:hover{transform:translateY(-2px);border-color:var(--gold)}
-    .tag{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
-    .t-green{background:rgba(34,197,94,.16);color:var(--green)}.t-amber{background:rgba(245,158,11,.16);color:var(--amber)}.t-red{background:rgba(239,68,68,.16);color:var(--red)}
-    .meta{display:grid;grid-template-columns:repeat(6,minmax(100px,1fr));gap:8px}
-    .meta div{background:#0b1423;border:1px solid #1b2740;border-radius:10px;padding:8px}.meta small{color:var(--muted);display:block}
-    .stages{display:grid;grid-template-columns:repeat(10,minmax(140px,1fr));gap:8px;overflow:auto;padding-bottom:6px}
-    .stage{padding:10px;border-radius:10px;border:1px solid var(--line);background:#0d1628;position:relative;min-height:86px;transition:.25s}
-    .stage:after{content:'';position:absolute;right:-8px;top:50%;width:8px;height:2px;background:var(--line)}.stage:last-child:after{display:none}
-    .stage small{color:var(--muted)} .stage b{font-size:12px;display:block;margin-top:7px}
-    .completed{border-color:rgba(34,197,94,.6);background:rgba(34,197,94,.1)}
-    .in-progress{border-color:rgba(245,158,11,.6);background:rgba(245,158,11,.1);animation:pulse 1.2s infinite}
-    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.3)}50%{box-shadow:0 0 0 8px rgba(245,158,11,0)}}
-    .split{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
-    table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #1e2a42;padding:10px;font-size:12px;text-align:left}th{color:var(--muted)}
-    .bar{height:8px;background:#1d2b44;border-radius:999px;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#eed78a)}
-    .chart{height:190px;display:flex;align-items:flex-end;gap:8px}.m{flex:1;text-align:center}.m div{background:linear-gradient(180deg,#efd889,var(--gold));border-radius:8px 8px 3px 3px}
-    .m small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
-    .alert{padding:10px;border-radius:10px;border:1px solid;margin-bottom:8px}
-    .ah{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.12)} .am{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.12)}
-    .chips{display:flex;gap:8px;flex-wrap:wrap}
-    .loader{display:none;color:var(--amber);font-size:12px}
-    @media (max-width:1120px){.kpis,.form,.customer-list,.meta,.split{grid-template-columns:repeat(2,minmax(180px,1fr))}}
-    @media (max-width:760px){.kpis,.form,.customer-list,.meta,.split{grid-template-columns:1fr}}
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+    .kpi{background:#0f1729;border:1px solid var(--line);padding:12px;border-radius:12px}
+    .kpi .v{font-size:1.2rem;font-weight:700;color:var(--gold)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+    .chip{background:#0f1729;border:1px solid var(--line);padding:10px;border-radius:10px}
+    .chip small{display:block;color:var(--muted)}
+    .stages{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:8px;overflow:auto}
+    .stage{border:1px solid var(--line);padding:10px;border-radius:10px;background:#0f1729;min-height:72px}
+    .done{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.12)}
+    .active{border-color:rgba(245,158,11,.65);background:rgba(245,158,11,.14)}
+    .badge{padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+    .low{background:rgba(34,197,94,.2);color:#86efac}.medium{background:rgba(245,158,11,.2);color:#fcd34d}.high{background:rgba(239,68,68,.2);color:#fca5a5}
+    table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #24324e;text-align:left;font-size:13px}th{color:var(--muted)}
+    button,select{font:inherit;background:#17233a;color:var(--text);border:1px solid var(--line);padding:8px 10px;border-radius:10px}
+    .fallback-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+    .fallback-card{background:var(--panel);border:1px solid var(--line);padding:28px;border-radius:14px;max-width:460px;text-align:center}
   </style>
 </head>
 <body>
-<div class="app">
-  <div class="header">
-    <div>
-      <h1><i class="fa-solid fa-building-columns"></i> Working Capital Credit Lifecycle Platform</h1>
-      <p class="sub">Origination → Credit Decisioning → Facility Setup → Monitoring in one continuous workflow.</p>
-    </div>
-    <div class="nav" id="nav"></div>
-  </div>
+  <div id="app" class="app"></div>
 
-  <section id="dashboard" class="view"></section>
-  <section id="customers" class="view"></section>
-  <section id="detail" class="view"></section>
-</div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const STORAGE_KEY = "wc-lifecycle-single-html-v1";
+      const STAGES = ["Origination", "Credit Appraisal", "Sanction", "Facility Setup", "Monitoring"];
 
-<script>
-const wcState = { customers: [], activeCustomerId: null, activeView: 'dashboard', facilityTab: 'fund', stageLoader: false };
+      const defaultCustomer = () => ({
+        id: "demo-1",
+        name: "Apex Textiles Pvt Ltd",
+        gstNumber: "27AAECA1234F1Z5",
+        bankName: "Axis Bank",
+        industry: "Textiles",
+        contactNumber: "+91 9898989898",
+        loanAccountNumber: "WC-AXIS-000182",
+        lifecycleIndex: 3,
+        riskRating: "Medium",
+        facilities: [
+          { type: "Cash Credit", sanctioned: 5000000, utilized: 4300000, roi: 10.25, renewalInDays: 28 },
+          { type: "Bank Guarantee", sanctioned: 2200000, utilized: 1600000, roi: 3.2, renewalInDays: 68 }
+        ]
+      });
 
-const STAGES = [
-  'Loan Application Received','Application Reviewed by Bank','Application Submitted into System','Credit Approval Decision','Loan Amount Approved (Based on Eligibility)','Document Preparation','Customer & Bank Notification','Contract Signing','Final System Submission','Fund Allocation'
-];
-const INDUSTRIES = ['Auto Components','Pharmaceuticals','Textiles','Agri Commodities','Electronics','Logistics'];
-const FACILITY_TYPES = { fund: ['Cash Credit (CC)','Overdraft (OD)','Term Loan'], nonfund:['LC','BG','LCBN'] };
-const COLLATERALS = ['SOCP (Self-Occupied Commercial Property)','SORP (Self-Occupied Residential Property)','Current Assets'];
+      const state = {
+        customers: [],
+        selectedId: "",
+      };
 
-const inr=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n||0);
-const pct=n=>`${(n||0).toFixed(1)}%`;
-const fmt=d=>new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-const $=id=>document.getElementById(id);
+      const appEl = document.getElementById("app");
+      if (!appEl) {
+        console.log("Critical failure: root #app element missing");
+        return;
+      }
 
-function seed(){
-  const c={
-    id: crypto.randomUUID(), profile:{name:'Shivam Engineering Pvt Ltd', gst:'27AAKCS1199H1ZX', industry:'Auto Components', bank:'HDFC Bank', contact:'+91 98201 66754', loanAccount:'HDFC/WC/2026/001128'},
-    lifecycleStage:'Initiated', workflowIndex:2,
-    financials:{annualTurnover:185000000, operatingCycle:92, inventoryDays:46, receivablesDays:52, payablesDays:32, existingLimits:30000000},
-    eligibility:{}, facilities:[], monitoring:{ccUtilization:[61,63,66,70,72,76,79,81,84,89,86,88],interestPaid:0,interestPayable:0}
-  };
-  computeEligibility(c);
-  c.facilities.push(makeFacility('Cash Credit (CC)','fund',42000000,11.8,12,plusMonths(8),[COLLATERALS[0],COLLATERALS[2]],35000000));
-  c.facilities.push(makeFacility('LC','nonfund',12000000,1.8,9,plusMonths(1),[COLLATERALS[2]],11500000));
-  wcState.customers=[c]; wcState.activeCustomerId=c.id;
-}
+      function toNumber(v) {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : 0;
+      }
 
-function plusMonths(m){ const d=new Date(); d.setMonth(d.getMonth()+m); return d.toISOString().slice(0,10); }
-function makeFacility(type,kind,limit,roi,tenure,renewal,collateral,utilized){
-  const days=30; const interestPayable=Math.round((utilized*roi*days)/(365*100));
-  return {id:crypto.randomUUID(),type,kind,sanctionedLimit:limit,interestRate:roi,tenure,renewalDate:renewal,collateral,utilized,interestPaid:Math.round(interestPayable*4.3),interestPayable,risk: riskFor(utilized,limit,renewal)};
-}
-function riskFor(utilized,limit,renewal){
-  const u=(utilized/limit)*100, days=(new Date(renewal)-new Date())/86400000;
-  if(u>=95||days<=15) return 'High'; if(u>=85||days<=45) return 'Medium'; return 'Low';
-}
+      function money(v) {
+        return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(toNumber(v));
+      }
 
-function active(){ return wcState.customers.find(c=>c.id===wcState.activeCustomerId); }
+      function save() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ customers: state.customers, selectedId: state.selectedId }));
+        } catch (e) {
+          console.log("State save failed:", e);
+        }
+      }
 
-function computeEligibility(c){
-  const f=c.financials;
-  const annualCOGS=f.annualTurnover*0.78;
-  const daily=annualCOGS/365;
-  const wcg=daily*Math.max(0,(f.inventoryDays+f.receivablesDays-f.payablesDays));
-  const mpbf=Math.max(0,wcg*0.75);
-  const rec=Math.max(0,mpbf-f.existingLimits);
-  c.eligibility={annualCOGS,daily,workingCapitalGap:wcg,mpbf,recommendedCC:rec};
-}
+      function load() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return false;
+          const parsed = JSON.parse(raw);
+          if (!parsed || !Array.isArray(parsed.customers)) return false;
+          state.customers = parsed.customers;
+          state.selectedId = parsed.selectedId || "";
+          return true;
+        } catch (e) {
+          console.log("State load failed:", e);
+          return false;
+        }
+      }
 
-function nav(){
-  $('nav').innerHTML=['dashboard','customers','detail'].map(v=>`<button class="btn ${wcState.activeView===v?'active':''}" onclick="setView('${v}')">${v[0].toUpperCase()+v.slice(1)}</button>`).join('');
-}
-function setView(v){ wcState.activeView=v; render(); }
+      function ensureDemoState() {
+        if (!Array.isArray(state.customers) || state.customers.length === 0) {
+          console.log("Critical state missing: initializing default demo customer");
+          state.customers = [defaultCustomer()];
+        }
+        const exists = state.customers.some(c => c && c.id === state.selectedId);
+        if (!exists) state.selectedId = state.customers[0] && state.customers[0].id ? state.customers[0].id : "demo-1";
+      }
 
-function renderDashboard(){
-  const all=wcState.customers.flatMap(c=>c.facilities.map(f=>({...f,cName:c.profile.name}))); const exp=all.reduce((a,f)=>a+f.sanctionedLimit,0);
-  const util=all.reduce((a,f)=>a+f.utilized,0); const wroi=exp?all.reduce((a,f)=>a+(f.interestRate*f.sanctionedLimit),0)/exp:0;
-  const paid=all.reduce((a,f)=>a+f.interestPaid,0), pay=all.reduce((a,f)=>a+f.interestPayable,0);
-  $('dashboard').innerHTML=`
-    <div class="grid kpis">
-      ${[['Total Exposure',inr(exp)],['Amount Utilized',inr(util)],['Weighted Avg ROI',wroi.toFixed(2)+'%'],['Total Interest Paid',inr(paid)],['Interest Payable',inr(pay)],['Portfolio Customers',wcState.customers.length]].map(k=>`<div class='card kpi'><div class='v'>${k[1]}</div><div class='l'>${k[0]}</div></div>`).join('')}
-    </div>
-    <div class="card panel">
-      <div class="row"><h3>Portfolio Alerts</h3><span class="muted">Auto-generated by risk rules</span></div>
-      ${portfolioAlerts().map(a=>`<div class="alert ${a.level==='High'?'ah':'am'}"><i class="fa-solid fa-triangle-exclamation"></i> ${a.text}</div>`).join('') || '<div class="alert am">No active portfolio alerts.</div>'}
-    </div>
-  `;
-}
+      function activeCustomer() {
+        return state.customers.find(c => c && c.id === state.selectedId) || state.customers[0] || null;
+      }
 
-function renderCustomers(){
-  $('customers').innerHTML=`
-    <div class="card panel">
-      <div class="row"><h3>Customer Onboarding</h3><button class="btn primary" onclick="document.getElementById('onboardForm').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-user-plus"></i> Add New Customer</button></div>
-      <form id="onboardForm" class="form" onsubmit="createCustomer(event)">
-        ${[
-          ['Customer Name','text','name','e.g. Metro Steel Traders LLP'],
-          ['GST Number','text','gst','e.g. 27AAACM1234B1ZP'],
-          ['Industry','select','industry',''],
-          ['Bank Name','text','bank','e.g. ICICI Bank'],
-          ['Contact Number','text','contact','e.g. +91 98XXXXXXXX']
-        ].map(x=>x[1]==='select'?`<label class='f'><span>${x[0]}</span><select name='${x[2]}' required><option value=''>Select Industry</option>${INDUSTRIES.map(i=>`<option>${i}</option>`).join('')}</select></label>`:`<label class='f'><span>${x[0]}</span><input type='${x[1]}' name='${x[2]}' placeholder='${x[3]}' required/></label>`).join('')}
-        <div class='f' style='justify-content:flex-end'><span>&nbsp;</span><button class='btn primary' type='submit'>Create Relationship</button></div>
-      </form>
-    </div>
-    <div class="customer-list" style="margin-top:14px">
-      ${wcState.customers.map(c=>`<div class="card customer-item" onclick="openCustomer('${c.id}')"><div class='row'><b>${c.profile.name}</b><span class='tag t-amber'>${c.lifecycleStage}</span></div><div class='muted' style='margin-top:8px'>${c.profile.gst} • ${c.profile.bank}</div><div class='muted'>${c.profile.industry} • ${c.profile.contact}</div></div>`).join('')}
-    </div>
-  `;
-}
+      function riskClass(risk) {
+        const v = String(risk || "low").toLowerCase();
+        if (v.includes("high")) return "high";
+        if (v.includes("med")) return "medium";
+        return "low";
+      }
 
-function createCustomer(e){
-  e.preventDefault(); const d=Object.fromEntries(new FormData(e.target).entries());
-  const id=crypto.randomUUID();
-  wcState.customers.unshift({
-    id, profile:{...d,loanAccount:`${d.bank.split(' ')[0].toUpperCase()}/WC/${new Date().getFullYear()}/${String(Math.floor(100000+Math.random()*899999))}`}, lifecycleStage:'Initiated', workflowIndex:0,
-    financials:{annualTurnover:0,operatingCycle:0,inventoryDays:0,receivablesDays:0,payablesDays:0,existingLimits:0}, eligibility:{annualCOGS:0,daily:0,workingCapitalGap:0,mpbf:0,recommendedCC:0}, facilities:[], monitoring:{ccUtilization:[42,46,49,53,58,61,66,63,69,72,75,71],interestPaid:0,interestPayable:0}
-  });
-  wcState.activeCustomerId=id; wcState.activeView='detail'; render();
-}
-function openCustomer(id){ wcState.activeCustomerId=id; wcState.activeView='detail'; render(); }
+      function renderFallback() {
+        appEl.innerHTML = '<div class="fallback-wrap"><div class="fallback-card"><h2>System Initialized – Demo Mode Active</h2><p class="muted">Fallback rendering engaged. The platform is running with safe demo defaults.</p></div></div>';
+      }
 
-function renderDetail(){
-  const c=active(); if(!c){ $('detail').innerHTML='<div class="card panel">No customer selected.</div>'; return; }
-  $('detail').innerHTML=`
-    <div class="card panel">
-      <div class="row"><h3>Customer Information Header</h3><button class="btn" onclick="setView('customers')"><i class="fa-solid fa-arrow-left"></i> Back to Customers</button></div>
-      <div class="meta">${[['Name',c.profile.name],['GST',c.profile.gst],['Bank',c.profile.bank],['Industry',c.profile.industry],['Contact',c.profile.contact],['Loan Account Number',c.profile.loanAccount]].map(m=>`<div><small>${m[0]}</small><b>${m[1]}</b></div>`).join('')}</div>
-    </div>
+      function render() {
+        if (!appEl) return;
+        ensureDemoState();
+        const c = activeCustomer();
+        if (!c) {
+          renderFallback();
+          return;
+        }
 
-    <div class="card panel">
-      <div class="row"><h3>Working Capital Eligibility & Credit Decisioning</h3><span class="muted">Live computation based on accepted credit norms</span></div>
-      <form class="form" oninput="updateFinancials(event)">
-        ${[
-          ['Annual Turnover (₹)','annualTurnover'],['Operating Cycle (Days)','operatingCycle'],['Inventory Days','inventoryDays'],['Receivables Days','receivablesDays'],['Payables Days','payablesDays'],['Existing Working Capital Limits (₹)','existingLimits']
-        ].map(x=>`<label class='f'><span>${x[0]}</span><input type='number' min='0' name='${x[1]}' value='${c.financials[x[1]]}'/></label>`).join('')}
-      </form>
-      <div class="grid kpis" style="margin-top:12px">
-        <div class='card kpi'><div class='v'>${inr(c.eligibility.workingCapitalGap)}</div><div class='l'>Working Capital Gap</div><div class='muted'>Formula: Daily COGS × (Inventory + Receivables − Payables)</div></div>
-        <div class='card kpi'><div class='v'>${inr(c.eligibility.mpbf)}</div><div class='l'>MPBF / Eligible WC Limit</div><div class='muted'>Formula: 75% × Working Capital Gap</div></div>
-        <div class='card kpi'><div class='v'>${inr(c.eligibility.recommendedCC)}</div><div class='l'>Recommended Cash Credit Limit</div><div class='muted'>Formula: MPBF − Existing Limits</div></div>
-      </div>
-      <div class="row" style="margin-top:10px"><button class='btn primary' onclick='advanceStage()'>Proceed to Loan Application</button><span class='loader' id='loader'>Processing application movement...</span></div>
-    </div>
+        const facilities = Array.isArray(c.facilities) ? c.facilities : [];
+        const exposure = facilities.reduce((s, f) => s + toNumber(f.sanctioned), 0);
+        const utilized = facilities.reduce((s, f) => s + toNumber(f.utilized), 0);
+        const utilization = exposure > 0 ? ((utilized / exposure) * 100).toFixed(1) : "0.0";
 
-    <div class="card panel">
-      <div class="row"><h3>Loan Application Acceptance Workflow</h3><span class='tag ${c.workflowIndex===9?'t-green':'t-amber'}'>${c.workflowIndex===9?'Completed':'In Progress'}</span></div>
-      <div class="stages">${STAGES.map((s,i)=>`<div class='stage ${i<c.workflowIndex?'completed':i===c.workflowIndex?'in-progress':''}'><small>${i<c.workflowIndex?'Completed':i===c.workflowIndex?'In Progress':'Pending'}</small><b>${s}</b></div>`).join('')}</div>
-    </div>
+        appEl.innerHTML = `
+          <div class="panel">
+            <div class="row">
+              <div>
+                <h1>Working Capital Credit Lifecycle</h1>
+                <div class="muted">Dashboard + Lifecycle Monitoring</div>
+              </div>
+              <div class="row">
+                <label class="muted">Customer
+                  <select id="customerSelect">${state.customers.map(x => `<option value="${x.id}" ${x.id === c.id ? "selected" : ""}>${x.name || "Unknown"}</option>`).join("")}</select>
+                </label>
+                <button id="nextStageBtn">Advance Stage</button>
+              </div>
+            </div>
+          </div>
 
-    <div class="split">
-      <div class="card panel">
-        <div class="row"><h3>Facility Creation & Collateral Mapping</h3><button class='btn primary' onclick='addFacility(event)'><i class="fa-solid fa-plus"></i> Add Facility</button></div>
-        <form id='facilityForm' class='form'>
-          <label class='f'><span>Facility Category</span><select name='kind'><option value='fund'>Fund Based</option><option value='nonfund'>Non-Fund Based</option></select></label>
-          <label class='f'><span>Facility Type</span><select name='type' id='facilityType'></select></label>
-          <label class='f'><span>Sanctioned Limit (₹)</span><input type='number' name='limit' min='1' required></label>
-          <label class='f'><span>Interest Rate (%)</span><input type='number' name='roi' min='0' step='0.01' required></label>
-          <label class='f'><span>Tenure (Months)</span><input type='number' name='tenure' min='1' required></label>
-          <label class='f'><span>Renewal Date</span><input type='date' name='renewal' required></label>
-          <label class='f'><span>Current Utilized Amount (₹)</span><input type='number' name='utilized' min='0' required></label>
-        </form>
-        <div class='chips'>${COLLATERALS.map((c,i)=>`<label class='tag t-amber' style='cursor:pointer'><input type='checkbox' class='col' value='${c}' ${i===0?'checked':''}/> ${c}</label>`).join('')}</div>
-      </div>
+          <div class="panel">
+            <div class="row">
+              <h3>${c.name || "Demo Customer"}</h3>
+              <span class="badge ${riskClass(c.riskRating)}">${c.riskRating || "Low"} Risk</span>
+            </div>
+            <div class="grid" style="margin-top:10px">
+              <div class="chip"><small>GST Number</small>${c.gstNumber || "NA"}</div>
+              <div class="chip"><small>Bank Name</small>${c.bankName || "NA"}</div>
+              <div class="chip"><small>Industry</small>${c.industry || "NA"}</div>
+              <div class="chip"><small>Contact</small>${c.contactNumber || "NA"}</div>
+              <div class="chip"><small>Loan Account</small>${c.loanAccountNumber || "NA"}</div>
+            </div>
+          </div>
 
-      <div class="card panel">
-        <div class='row'><h3>Post-Disbursement Portfolio Monitoring Dashboard</h3><div class='seg'>
-          <button class='btn ${wcState.facilityTab==='fund'?'active':''}' onclick="switchTab('fund')">Fund Based</button>
-          <button class='btn ${wcState.facilityTab==='nonfund'?'active':''}' onclick="switchTab('nonfund')">Non-Fund Based</button>
-        </div></div>
-        ${monitorPanel(c)}
-      </div>
-    </div>
-  `;
-  refreshFacilityType();
-}
+          <div class="panel">
+            <h3>Dashboard</h3>
+            <div class="kpis" style="margin-top:10px">
+              <div class="kpi"><div class="v">${money(exposure)}</div><div class="muted">Total Sanctioned Exposure</div></div>
+              <div class="kpi"><div class="v">${money(utilized)}</div><div class="muted">Total Utilized Amount</div></div>
+              <div class="kpi"><div class="v">${utilization}%</div><div class="muted">Portfolio Utilization</div></div>
+              <div class="kpi"><div class="v">${facilities.length}</div><div class="muted">Active Facilities</div></div>
+            </div>
+          </div>
 
-function monitorPanel(c){
-  const f=c.facilities.filter(x=>x.kind===wcState.facilityTab); const exp=f.reduce((a,x)=>a+x.sanctionedLimit,0); const util=f.reduce((a,x)=>a+x.utilized,0);
-  const roi=exp?f.reduce((a,x)=>a+x.interestRate*x.sanctionedLimit,0)/exp:0; const paid=f.reduce((a,x)=>a+x.interestPaid,0), payable=f.reduce((a,x)=>a+x.interestPayable,0);
-  const collateral=[...new Set(f.flatMap(x=>x.collateral))].join(', ')||'—';
-  return `
-    <div class='grid kpis'>${[['Total Exposure',inr(exp)],['Amount Utilized',inr(util)],['Weighted Avg ROI',roi.toFixed(2)+'%'],['Collateral Summary',collateral],['Total Interest Paid',inr(paid)],['Interest Payable',inr(payable)]
-      .map(k=>`<div class='card kpi'><div class='v' style='font-size:${k[0]==='Collateral Summary'?'13px':'18px'}'>${k[1]}</div><div class='l'>${k[0]}</div></div>`).join('')}</div>
-    <div style='overflow:auto;margin-top:10px'><table><thead><tr><th>Facility Type</th><th>Exposure</th><th>Utilized</th><th>Utilization %</th><th>ROI</th><th>Collateral</th><th>Interest Paid</th><th>Interest Payable</th><th>Renewal</th><th>Risk</th></tr></thead>
-      <tbody>${f.map(x=>{const u=x.sanctionedLimit?x.utilized/x.sanctionedLimit*100:0;const cls=x.risk==='High'?'t-red':x.risk==='Medium'?'t-amber':'t-green';
-      return `<tr><td>${x.type}</td><td>${inr(x.sanctionedLimit)}</td><td>${inr(x.utilized)}</td><td><div class='bar'><span style='width:${Math.min(100,u)}%'></span></div>${pct(u)}</td><td>${x.interestRate}%</td><td>${x.collateral.join(', ')}</td><td>${inr(x.interestPaid)}</td><td>${inr(x.interestPayable)}</td><td>${fmt(x.renewalDate)}</td><td><span class='tag ${cls}'>${x.risk}</span></td></tr>`;}).join('') || '<tr><td colspan="10" class="muted">No facilities availed in this segment.</td></tr>'}
-      </tbody></table></div>
-    <div class='card panel' style='margin-top:12px'><div class='row'><b>CC Utilization Analytics</b><span class='muted'>Month-wise (%)</span></div><div class='chart'>${['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'].map((m,i)=>`<div class='m'><div style='height:${(c.monitoring.ccUtilization[i]||0)*1.5}px'></div><small>${m} ${(c.monitoring.ccUtilization[i]||0)}%</small></div>`).join('')}</div></div>
-    <div class='card panel' style='margin-top:12px'><b>Portfolio Alerts</b>${customerAlerts(c).map(a=>`<div class='alert ${a.level==='High'?'ah':'am'}'>${a.text}</div>`).join('') || '<div class="alert am">No active alerts.</div>'}</div>
-  `;
-}
+          <div class="panel">
+            <h3>Lifecycle Flow</h3>
+            <div class="stages" style="margin-top:10px">
+              ${STAGES.map((s, i) => `<div class="stage ${i < toNumber(c.lifecycleIndex) ? "done" : i === toNumber(c.lifecycleIndex) ? "active" : ""}"><small>${i < toNumber(c.lifecycleIndex) ? "Completed" : i === toNumber(c.lifecycleIndex) ? "In Progress" : "Pending"}</small><div><b>${s}</b></div></div>`).join("")}
+            </div>
+          </div>
 
-function portfolioAlerts(){ return wcState.customers.flatMap(c=>customerAlerts(c).slice(0,2).map(a=>({level:a.level,text:`${c.profile.name}: ${a.text}`}))); }
-function customerAlerts(c){
-  const alerts=[]; c.facilities.forEach(f=>{const u=f.sanctionedLimit?f.utilized/f.sanctionedLimit*100:0; const days=(new Date(f.renewalDate)-new Date())/86400000;
-    if(u>90) alerts.push({level:'High',text:`${f.type} utilization at ${u.toFixed(1)}% exceeds 90%.`});
-    if(days<=30) alerts.push({level:'Medium',text:`${f.type} renewal due on ${fmt(f.renewalDate)}.`});
-    if(f.utilized>=f.sanctionedLimit) alerts.push({level:'High',text:`${f.type} limit exhausted. Immediate action required.`});
-    if(f.risk==='High') alerts.push({level:'High',text:`${f.type} flagged as high risk by monitoring logic.`});
-  });
-  return alerts;
-}
+          <div class="panel">
+            <h3>Facility Snapshot</h3>
+            <table>
+              <thead><tr><th>Facility</th><th>Sanctioned</th><th>Utilized</th><th>ROI</th><th>Renewal (Days)</th></tr></thead>
+              <tbody>
+                ${facilities.length ? facilities.map(f => `<tr><td>${f.type || "NA"}</td><td>${money(f.sanctioned)}</td><td>${money(f.utilized)}</td><td>${toNumber(f.roi).toFixed(2)}%</td><td>${toNumber(f.renewalInDays)}</td></tr>`).join("") : '<tr><td colspan="5">No facilities found.</td></tr>'}
+              </tbody>
+            </table>
+          </div>`;
 
-function updateFinancials(e){
-  const c=active(); if(!c) return;
-  const fm=e.currentTarget; c.financials=Object.fromEntries(new FormData(fm).entries());
-  Object.keys(c.financials).forEach(k=>c.financials[k]=Number(c.financials[k]||0));
-  computeEligibility(c); c.lifecycleStage='Under Assessment'; renderDetail();
-}
+        const selectEl = document.getElementById("customerSelect");
+        const nextStageBtn = document.getElementById("nextStageBtn");
 
-function advanceStage(){
-  const c=active(); if(!c || c.workflowIndex>=9) return;
-  $('loader').style.display='inline';
-  setTimeout(()=>{ c.workflowIndex++; c.lifecycleStage = c.workflowIndex>=9?'Funded':'Processing'; $('loader').style.display='none'; renderDetail(); },650);
-}
+        if (selectEl) {
+          selectEl.addEventListener("change", function(e) {
+            state.selectedId = e.target && e.target.value ? e.target.value : state.selectedId;
+            save();
+            render();
+          });
+        }
 
-function refreshFacilityType(){
-  const form=$('facilityForm'); if(!form) return; const kind=form.kind.value;
-  $('facilityType').innerHTML=FACILITY_TYPES[kind].map(t=>`<option>${t}</option>`).join('');
-  form.kind.onchange=refreshFacilityType;
-}
+        if (nextStageBtn) {
+          nextStageBtn.addEventListener("click", function() {
+            const current = activeCustomer();
+            if (!current) return;
+            current.lifecycleIndex = Math.min(STAGES.length - 1, toNumber(current.lifecycleIndex) + 1);
+            save();
+            render();
+          });
+        }
+      }
 
-function addFacility(e){
-  e.preventDefault(); const c=active(); const form=$('facilityForm'); if(!c||!form.reportValidity()) return;
-  const d=Object.fromEntries(new FormData(form).entries()); const collateral=[...document.querySelectorAll('.col:checked')].map(x=>x.value);
-  if(!collateral.length){ alert('Please select at least one collateral.'); return; }
-  c.facilities.push(makeFacility(d.type,d.kind,Number(d.limit),Number(d.roi),Number(d.tenure),d.renewal,collateral,Number(d.utilized)));
-  c.lifecycleStage='Facilities Configured'; form.reset(); refreshFacilityType(); renderDetail();
-}
-function switchTab(t){ wcState.facilityTab=t; renderDetail(); }
-
-function render(){ nav(); ['dashboard','customers','detail'].forEach(v=>$(v).classList.toggle('active',wcState.activeView===v)); renderDashboard(); renderCustomers(); renderDetail(); }
-seed(); render();
-</script>
+      try {
+        load();
+        ensureDemoState();
+        save();
+        render();
+      } catch (error) {
+        console.log("Initialization error:", error);
+        renderFallback();
+      }
+    });
+  </script>
 </body>
 </html>
